@@ -34,9 +34,15 @@ object HttpClientPool {
                 connectTimeoutMillis = config.timeoutMillis * 1000L
                 requestTimeoutMillis = config.timeoutMillis * 1000L
             }
-            if (config.enableLogging) {
+            if (config.loggers.isNotEmpty()) {
                 install(Logging) {
-                    logger = NapierLogger
+                    logger = object : Logger {
+                        override fun log(message: String) {
+                            config.loggers.forEach {
+                                it(message)
+                            }
+                        }
+                    }
                     level = LogLevel.BODY
                 }
             }
